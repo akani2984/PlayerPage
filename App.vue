@@ -13,6 +13,9 @@ function makeoutlist(e) {
     list.value = [];
     for (let i = 0 ; i < e.target.files.length ; i++ ) {
         list.value.push({ id: i, obj: e.target.files[i], name: e.target.files[i].name });
+        if (i == 0) {
+          player(0)
+        }
     }
 }
 function play(row) {
@@ -20,16 +23,18 @@ function play(row) {
     
 }
 function playauto() {
-  if (playmode.value == '顺序') {
-      let id = playid + 1;
-      player(id);
-    }
-    if (playmode.value == '随机') {
-      let id = Math.floor(Math.random()*(list.value.length));
-      if (id == playid || id != 0) {
-        id = Math.floor(Math.random()*(list.value.length));
-      }
-    player(id);
+    if (playmode.value == '顺序') {
+      if (playid < list.value.length -1) {
+       player(playid + 1);
+  }}
+  if (playmode.value == '随机' && list.value.length > 1) {
+    let nplayid = playid
+    while (nplayid == playid) {
+    nplayid = Math.floor(Math.random()*(list.value.length));
+    if (nplayid != playid) {
+    player(nplayid);
+    break;
+  }}
     }
 }
 function playpervious () {
@@ -39,15 +44,20 @@ function playpervious () {
   player(playid - 1);
 }
 function playnext() {
-  if (playmode.value == '随机') {
-    let nplayid = Math.floor(Math.random()*(list.value.length));
-      if (nplayid == playid || nplayid != 0) {
-        nplayid = Math.floor(Math.random()*(list.value.length));
-      }
-      player(nplayid)
-    } else {
-      player(playid + 1);
-    }
+  if (playmode.value == '随机' && list.value.length > 1) {
+    let nplayid = playid
+    while (nplayid == playid) {
+    nplayid = Math.floor(Math.random()*(list.value.length));
+    if (nplayid != playid) {
+    player(nplayid);
+    break;
+  }
+  }
+
+  } else {
+    if (playid < list.value.length -1) {
+    player(playid + 1);
+  }}
 }
 function player(id) {
     playid = id;
@@ -74,7 +84,7 @@ function switchmode() {
 }
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
-    .register('/sw.js') // 指定 Service Worker 文件路径
+    .register('./sw.js') // 指定 Service Worker 文件路径
     .then(registration => console.log('ServiceWorker 注册成功'))
     .catch(err => console.log('注册失败:', err));
 }
@@ -87,7 +97,7 @@ if ('serviceWorker' in navigator) {
   <div class="common-layout">
     <el-container >
       <el-header style="border-bottom: 1px solid var(--el-border-color); height: 6vh; display: flex; align-items: center">
-            PlayerWeb
+            PlayerPage
       </el-header>
       <el-container>
         <el-main style="height: 85vh;">
